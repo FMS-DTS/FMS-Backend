@@ -6,6 +6,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
@@ -27,14 +28,15 @@ public class ExcelService {
     @Autowired
     private ResourceLoader resourceLoader;
 
-    private static final String FILE_NAME = "data.xlsx";
+    @Value("${excel.file.path}")
+    private String excelFilePath;
     private static final String PLACEHOLDER = "N/A";
 
     public void readExcelAndSaveToDatabase() throws IOException {
-        logger.info("Reading Excel file from classpath: excel/{}", FILE_NAME);
+        logger.info("Reading Excel file from {}", excelFilePath);
 
         // Load the resource from the classpath
-        Resource resource = resourceLoader.getResource("classpath:excel/" + FILE_NAME);
+        Resource resource = resourceLoader.getResource(excelFilePath);
 
         try (InputStream file = resource.getInputStream()) {
             Workbook workbook = WorkbookFactory.create(file);
