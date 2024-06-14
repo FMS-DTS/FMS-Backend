@@ -3,8 +3,11 @@ package com.sqltest.demo.service;
 import com.sqltest.demo.model.SalesOrder;
 import com.sqltest.demo.repository.SalesOrderRepo;
 import org.apache.poi.ss.usermodel.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -15,105 +18,114 @@ import java.util.List;
 
 @Service
 public class ExcelService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ExcelService.class);
+
     @Autowired
     private SalesOrderRepo salesOrderRepository;
 
+    @Autowired
+    private ResourceLoader resourceLoader;
+
+    private static final String FILE_NAME = "data.xlsx";
     private static final String PLACEHOLDER = "N/A";
 
     public void readExcelAndSaveToDatabase() throws IOException {
-        ClassPathResource resource = new ClassPathResource("excel/data.xlsx");
-        InputStream file = resource.getInputStream();
-        Workbook workbook = WorkbookFactory.create(file);
-        Sheet sheet = workbook.getSheetAt(0);
-        List<SalesOrder> salesOrders = new ArrayList<>();
+        logger.info("Reading Excel file from classpath: excel/{}", FILE_NAME);
 
-        for (Row row : sheet) {
-            if (row.getRowNum() == 0) {
-                continue; // Skip header row
+        // Load the resource from the classpath
+        Resource resource = resourceLoader.getResource("classpath:excel/" + FILE_NAME);
+
+        try (InputStream file = resource.getInputStream()) {
+            Workbook workbook = WorkbookFactory.create(file);
+            Sheet sheet = workbook.getSheetAt(0);
+            List<SalesOrder> salesOrders = new ArrayList<>();
+
+            for (Row row : sheet) {
+                if (row.getRowNum() == 0) {
+                    continue; // Skip header row
+                }
+                if (row.getCell(0) == null) {
+                    continue; // Skip empty rows
+                }
+
+                SalesOrder salesOrder = createSalesOrderFromRow(row);
+                if (salesOrder != null) {
+                    salesOrders.add(salesOrder);
+                }
             }
-            if (row.getCell(0)==null) {
-                continue; // Skip empty rows
+
+            try {
+                salesOrderRepository.saveAll(salesOrders);
+                logger.info("{} sales orders saved to the database.", salesOrders.size());
+            } catch (Exception e) {
+                logger.error("Error saving sales orders to the database.", e);
+                throw e; // Propagate the exception to handle it at a higher level if necessary
+            } finally {
+                workbook.close();
             }
-
-            SalesOrder salesOrder = new SalesOrder();
-            salesOrder.setSoId(getCellValueAsInteger(row.getCell(0)));
-            salesOrder.setWarehouseName(getCellValueAsString(row.getCell(1)));
-            salesOrder.setPickupLocation(getCellValueAsString(row.getCell(2)));
-            salesOrder.setDropLocation(getCellValueAsString(row.getCell(3)));
-            salesOrder.setTags(parseTags(row.getCell(4)));
-            salesOrder.setQuantity(getCellValueAsInteger(row.getCell(5)));
-            salesOrder.setDistance(getCellValueAsInteger(row.getCell(6)));
-            salesOrder.setLoadingDate(getCellValueAsDate(row.getCell(7)));
-            salesOrder.setLoadingTime(getCellValueAsTime(row.getCell(8)));
-            salesOrder.setUnloadingDate(getCellValueAsDate(row.getCell(9)));
-            salesOrder.setUnloadingTime(getCellValueAsTime(row.getCell(10)));
-            salesOrder.setTotalAmount(getCellValueAsDouble(row.getCell(11)));
-            salesOrder.setBidding(getCellValueAsString(row.getCell(12)));
-            salesOrder.setBidStartDate(getCellValueAsDate(row.getCell(13)));
-            salesOrder.setBidStartTime(getCellValueAsTime(row.getCell(14)));
-            salesOrder.setBidDuration(getCellValueAsTime(row.getCell(15)));
-            salesOrder.setBidStartAmountPerKm(getCellValueAsDouble(row.getCell(16)));
-            salesOrder.setBidCloseAmountPerKm(getCellValueAsDouble(row.getCell(17)));
-            salesOrder.setDispatchDetails(getCellValueAsString(row.getCell(18)));
-
-            salesOrders.add(salesOrder);
+        } catch (IOException e) {
+            logger.error("Error reading Excel file: {}", e.getMessage());
+            throw e;
         }
+    }
 
-        salesOrderRepository.saveAll(salesOrders);
-        workbook.close();
-        file.close();
+    private SalesOrder createSalesOrderFromRow(Row row) {
+        SalesOrder salesOrder = new SalesOrder();
+        salesOrder.setSoId(getCellValueAsInteger(row.getCell(0)));
+        salesOrder.setWarehouseName(getCellValueAsString(row.getCell(1)));
+        salesOrder.setPickupLocation(getCellValueAsString(row.getCell(2)));
+        salesOrder.setDropLocation(getCellValueAsString(row.getCell(3)));
+        salesOrder.setTags(parseTags(row.getCell(4)));
+        salesOrder.setQuantity(getCellValueAsInteger(row.getCell(5)));
+        salesOrder.setDistance(getCellValueAsInteger(row.getCell(6)));
+        salesOrder.setLoadingDate(getCellValueAsString(row.getCell(7)));
+        salesOrder.setLoadingTime(getCellValueAsString(row.getCell(8)));
+        salesOrder.setUnloadingDate(getCellValueAsString(row.getCell(9)));
+        salesOrder.setUnloadingTime(getCellValueAsString(row.getCell(10)));
+        salesOrder.setTotalAmount(getCellValueAsDouble(row.getCell(11)));
+        salesOrder.setBidding(getCellValueAsString(row.getCell(12)));
+        salesOrder.setBidStartDate(getCellValueAsString(row.getCell(13)));
+        salesOrder.setBidStartTime(getCellValueAsString(row.getCell(14)));
+        salesOrder.setBidDuration(getCellValueAsString(row.getCell(15)));
+        salesOrder.setBidStartAmountPerKm(getCellValueAsDouble(row.getCell(16)));
+        salesOrder.setBidCloseAmountPerKm(getCellValueAsDouble(row.getCell(17)));
+        salesOrder.setDispatchDetails(getCellValueAsString(row.getCell(18)));
+
+        return salesOrder;
     }
 
     private String getCellValueAsString(Cell cell) {
         if (cell == null || cell.getCellType() == CellType.BLANK) {
             return null;
-        } else {
-            String cellValue = cell.toString();
-            return PLACEHOLDER.equals(cellValue) ? null : cellValue;
         }
+        String cellValue = cell.toString();
+        return PLACEHOLDER.equals(cellValue) ? null : cellValue;
+
     }
 
     private Integer getCellValueAsInteger(Cell cell) {
         if (cell == null || cell.getCellType() == CellType.BLANK) {
             return null;
-        } else {
-            return (int) cell.getNumericCellValue();
         }
+        return (int) cell.getNumericCellValue();
+
     }
 
     private Double getCellValueAsDouble(Cell cell) {
         if (cell == null || cell.getCellType() == CellType.BLANK) {
             return null;
-        } else {
-            return cell.getNumericCellValue();
         }
-    }
+        return cell.getNumericCellValue();
 
-    private String getCellValueAsDate(Cell cell) {
-        if (cell == null || cell.getCellType() == CellType.BLANK) {
-            return null;
-        } else {
-            String cellValue = cell.toString();
-            return PLACEHOLDER.equals(cellValue) ? null : cellValue;
-        }
-    }
-
-    private String getCellValueAsTime(Cell cell) {
-        if (cell == null || cell.getCellType() == CellType.BLANK) {
-            return null;
-        } else {
-            String cellValue = cell.toString();
-            return PLACEHOLDER.equals(cellValue) ? null : cellValue;
-        }
     }
 
     private List<String> parseTags(Cell cell) {
         if (cell == null || cell.getCellType() == CellType.BLANK) {
             return new ArrayList<>();
-        } else {
-            String cellValue = cell.toString();
-            return Arrays.asList(cellValue.substring(1, cellValue.length() - 1).split(", "));
         }
+        String cellValue = cell.toString();
+        return Arrays.asList(cellValue.substring(1, cellValue.length() - 1).split(", "));
+
     }
 }
-
