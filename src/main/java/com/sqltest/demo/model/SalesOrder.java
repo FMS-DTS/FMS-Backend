@@ -65,4 +65,6 @@ public class SalesOrder {
 
     @Column(name = "dispatch_details", length = 2000)
     private String dispatchDetails;
+
+    private boolean subscribed = false;
 }
