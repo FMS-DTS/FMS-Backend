@@ -9,6 +9,6 @@ import java.util.List;
 
 public interface SalesOrderRepo extends JpaRepository<SalesOrder, Long> {
 
-    // Add this method to find SalesOrders where bidding is "No"
+
     List<SalesOrder> findByBidding(String bidding);
 }
