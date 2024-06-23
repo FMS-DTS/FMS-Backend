@@ -2,6 +2,7 @@ package com.sqltest.demo.controller;
 
 import com.sqltest.demo.model.SalesOrder;
 import com.sqltest.demo.repository.SalesOrderRepo;
+import com.sqltest.demo.service.BiddingIndentService;
 import com.sqltest.demo.service.FixedIndentService;
 import com.sqltest.demo.model.SubscribedIndents;
 import com.sqltest.demo.service.saveIndentService;
@@ -13,8 +14,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.sqltest.demo.service.BiddingIndentDTO;
-
 
 
 import java.util.List;
@@ -45,9 +44,9 @@ public class IndentController{
     private SalesOrderRepo salesOrderRepo;
 
     @GetMapping("/biddingIndents")
-    public ResponseEntity<List<BiddingIndentDTO>> getBiddingIndents() {
+    public ResponseEntity<List<BiddingIndentService>> getBiddingIndents() {
         List<SalesOrder> salesOrders = salesOrderRepo.findByBidding("Yes");
-        List<BiddingIndentDTO> biddingIndents = salesOrders.stream().map(BiddingIndentDTO::new).collect(Collectors.toList());
+        List<BiddingIndentService> biddingIndents = salesOrders.stream().map(BiddingIndentService::new).collect(Collectors.toList());
         return new ResponseEntity<>(biddingIndents, HttpStatus.OK);
     }
 }
