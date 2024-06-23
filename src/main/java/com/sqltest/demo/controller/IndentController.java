@@ -4,6 +4,7 @@ import com.sqltest.demo.model.SalesOrder;
 import com.sqltest.demo.repository.SalesOrderRepo;
 import com.sqltest.demo.service.BiddingIndentService;
 import com.sqltest.demo.service.FixedIndentService;
+import com.sqltest.demo.service.SubscribedIndentService;
 import com.sqltest.demo.model.SubscribedIndents;
 import com.sqltest.demo.service.saveIndentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,5 +49,13 @@ public class IndentController{
         List<SalesOrder> salesOrders = salesOrderRepo.findByBidding("Yes");
         List<BiddingIndentService> biddingIndents = salesOrders.stream().map(BiddingIndentService::new).collect(Collectors.toList());
         return new ResponseEntity<>(biddingIndents, HttpStatus.OK);
+    }
+
+    @Autowired
+    private SubscribedIndentService subscribedIndentService;
+
+    @GetMapping("/subIndents")
+    public List<Map<String, Object>> getSubscribedIndents() {
+        return subscribedIndentService.getSubscribedIndents();
     }
 }
