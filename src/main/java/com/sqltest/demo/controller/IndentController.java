@@ -1,19 +1,25 @@
 package com.sqltest.demo.controller;
 
+import com.sqltest.demo.model.SalesOrder;
+import com.sqltest.demo.repository.SalesOrderRepo;
 import com.sqltest.demo.service.FixedIndentService;
 import com.sqltest.demo.model.SubscribedIndents;
 import com.sqltest.demo.service.saveIndentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.sqltest.demo.service.BiddingIndentDTO;
+
 
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/indents")
@@ -35,4 +41,13 @@ public class IndentController{
     }
 
 
+    @Autowired
+    private SalesOrderRepo salesOrderRepo;
+
+    @GetMapping("/biddingIndents")
+    public ResponseEntity<List<BiddingIndentDTO>> getBiddingIndents() {
+        List<SalesOrder> salesOrders = salesOrderRepo.findByBidding("Yes");
+        List<BiddingIndentDTO> biddingIndents = salesOrders.stream().map(BiddingIndentDTO::new).collect(Collectors.toList());
+        return new ResponseEntity<>(biddingIndents, HttpStatus.OK);
+    }
 }
