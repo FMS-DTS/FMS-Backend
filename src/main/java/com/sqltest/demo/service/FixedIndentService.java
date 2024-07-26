@@ -28,11 +28,9 @@ public class FixedIndentService {
             indentMap.put("quantity", order.getQuantity());
             indentMap.put("distance", order.getDistance());
 
-            // Combined loadingDate and loadingTime
             String loadingDateTime = order.getLoadingDate() + " " + order.getLoadingTime();
             indentMap.put("loadingDateTime", loadingDateTime);
 
-            // Combined unloadingDate and unloadingTime
             String unloadingDateTime = order.getUnloadingDate() + " " + order.getUnloadingTime();
             indentMap.put("unloadingDateTime", unloadingDateTime);
 
