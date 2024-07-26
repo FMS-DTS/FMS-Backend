@@ -27,12 +27,18 @@ public class FixedIndentService {
             indentMap.put("tags", order.getTags());
             indentMap.put("quantity", order.getQuantity());
             indentMap.put("distance", order.getDistance());
-            indentMap.put("loadingDate", order.getLoadingDate());
-            indentMap.put("loadingTime", order.getLoadingTime());
-            indentMap.put("unloadingDate", order.getUnloadingDate());
-            indentMap.put("unloadingTime", order.getUnloadingTime());
+
+            // Combined loadingDate and loadingTime
+            String loadingDateTime = order.getLoadingDate() + " " + order.getLoadingTime();
+            indentMap.put("loadingDateTime", loadingDateTime);
+
+            // Combined unloadingDate and unloadingTime
+            String unloadingDateTime = order.getUnloadingDate() + " " + order.getUnloadingTime();
+            indentMap.put("unloadingDateTime", unloadingDateTime);
+
             indentMap.put("totalAmount", order.getTotalAmount());
             indentMap.put("amountPerKm", order.getTotalAmount() / order.getDistance());
+            indentMap.put("dispatchDetails", order.getDispatchDetails()); // Included dispatch details
             return indentMap;
         }).collect(Collectors.toList());
     }
