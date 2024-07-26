@@ -23,9 +23,7 @@ public class BiddingIndentService {
     private String manufacturerName;
     private String bidStartDateTime;
     private String bidDuration;
-
-    // Default constructor
-
+    private String dispatchDetails;
 
     // Constructor to initialize from SalesOrder
     public BiddingIndentService(SalesOrder order) {
@@ -42,5 +40,6 @@ public class BiddingIndentService {
         this.manufacturerName = order.getWarehouseName();
         this.bidStartDateTime = order.getBidStartDate() + " " + order.getBidStartTime();
         this.bidDuration = order.getBidDuration();
+        this.dispatchDetails = order.getDispatchDetails();
     }
 }
