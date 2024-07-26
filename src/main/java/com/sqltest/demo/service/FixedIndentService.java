@@ -36,7 +36,7 @@ public class FixedIndentService {
 
             indentMap.put("totalAmount", order.getTotalAmount());
             indentMap.put("amountPerKm", order.getTotalAmount() / order.getDistance());
-            indentMap.put("dispatchDetails", order.getDispatchDetails()); // Included dispatch details
+            indentMap.put("dispatchDetails", order.getDispatchDetails());
             return indentMap;
         }).collect(Collectors.toList());
     }
