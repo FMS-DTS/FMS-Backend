@@ -28,7 +28,8 @@ public class SubscribedIndentService {
                     "warehouseName", salesOrder.getWarehouseName(),
                     "quantity", salesOrder.getQuantity(),
                     "unloadingDate", salesOrder.getUnloadingDate(),
-                    "unloadingTime", salesOrder.getUnloadingTime()
+                    "unloadingTime", salesOrder.getUnloadingTime(),
+	                "approval", salesOrder.getApproval()
             );
 
             return indentMap;
