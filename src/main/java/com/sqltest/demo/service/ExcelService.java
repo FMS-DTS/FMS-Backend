@@ -93,6 +93,7 @@ public class ExcelService {
         salesOrder.setBidStartAmountPerKm(getCellValueAsDouble(row.getCell(16)));
         salesOrder.setBidCloseAmountPerKm(getCellValueAsDouble(row.getCell(17)));
         salesOrder.setDispatchDetails(getCellValueAsString(row.getCell(18)));
+        salesOrder.setApproval(getCellValueAsString(row.getCell(19)));
 
         return salesOrder;
     }

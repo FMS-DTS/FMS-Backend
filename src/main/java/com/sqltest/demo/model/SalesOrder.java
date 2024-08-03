@@ -67,4 +67,6 @@ public class SalesOrder {
     private String dispatchDetails;
 
     private boolean subscribed = false;
+
+    private String approval;
 }
