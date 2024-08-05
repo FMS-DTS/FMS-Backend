@@ -25,6 +25,7 @@ public class SubscribedIndentService {
 
             Map<String, Object> indentMap = Map.of(
                     "soId", salesOrder.getSoId(),
+                    "approval", salesOrder.getApproval(),
                     "warehouseName", salesOrder.getWarehouseName(),
                     "quantity", salesOrder.getQuantity(),
                     "unloadingDateTime", salesOrder.getUnloadingDate() + " " + salesOrder.getUnloadingTime()
