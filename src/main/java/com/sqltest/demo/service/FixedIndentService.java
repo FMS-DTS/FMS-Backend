@@ -17,7 +17,7 @@ public class FixedIndentService {
     private SalesOrderRepo salesOrderRepo;
 
     public List<Map<String, Object>> getFixedIndents() {
-        List<SalesOrder> salesOrders = salesOrderRepo.findByBidding("No");
+        List<SalesOrder> salesOrders = salesOrderRepo.findByBiddingAndSubscribed("No",false);
         return salesOrders.stream().map(order -> {
             Map<String, Object> indentMap = new HashMap<>();
             indentMap.put("soId", order.getSoId());

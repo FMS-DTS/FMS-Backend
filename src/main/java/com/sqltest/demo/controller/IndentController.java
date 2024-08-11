@@ -46,7 +46,7 @@ public class IndentController{
 
     @GetMapping("/biddingIndents")
     public ResponseEntity<List<BiddingIndentService>> getBiddingIndents() {
-        List<SalesOrder> salesOrders = salesOrderRepo.findByBidding("Yes");
+        List<SalesOrder> salesOrders = salesOrderRepo.findByBiddingAndSubscribed("Yes",false);
         List<BiddingIndentService> biddingIndents = salesOrders.stream().map(BiddingIndentService::new).collect(Collectors.toList());
         return new ResponseEntity<>(biddingIndents, HttpStatus.OK);
     }

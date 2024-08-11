@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface SalesOrderRepo extends JpaRepository<SalesOrder, Long> {
-    List<SalesOrder> findByBidding(String bidding);
+    List<SalesOrder> findByBiddingAndSubscribed(String bidding,boolean subscribed);
 }
