@@ -51,6 +51,14 @@ public class ExcelService {
                     continue; // Skip empty rows
                 }
 
+                Integer soId = getCellValueAsInteger(row.getCell(0));
+
+                // Check if the indent already exists in the database
+                if (salesOrderRepository.existsById(soId.longValue())) {
+                    logger.warn("Sales order with soId {} already exists. Skipping...", soId);
+                    continue; // Skip if it already exists
+                }
+
                 SalesOrder salesOrder = createSalesOrderFromRow(row);
                 if (salesOrder != null) {
                     salesOrders.add(salesOrder);
@@ -71,6 +79,7 @@ public class ExcelService {
             throw e;
         }
     }
+
 
     private SalesOrder createSalesOrderFromRow(Row row) {
         SalesOrder salesOrder = new SalesOrder();
