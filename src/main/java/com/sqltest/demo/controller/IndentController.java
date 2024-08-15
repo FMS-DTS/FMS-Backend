@@ -51,6 +51,12 @@ public class IndentController{
         return new ResponseEntity<>(biddingIndents, HttpStatus.OK);
     }
 
+    @GetMapping("/whNames")
+    public ResponseEntity<List<String>> getUniqueWarehouseNames() {
+        List<String> uniqueWarehouseNames = salesOrderRepo.findUniqueWarehouseNames();
+        return ResponseEntity.ok(uniqueWarehouseNames);
+    }
+
     @Autowired
     private SubscribedIndentService subscribedIndentService;
 
