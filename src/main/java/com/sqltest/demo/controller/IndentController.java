@@ -15,7 +15,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
+import com.sqltest.demo.service.SalesOrderService;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -63,5 +64,17 @@ public class IndentController{
     @GetMapping("/subIndents")
     public List<Map<String, Object>> getSubscribedIndents() {
         return subscribedIndentService.getSubscribedIndents();
+    }
+    @Autowired
+    private SalesOrderService salesOrderService;
+
+    @GetMapping("/soId")
+    public ResponseEntity<Map<String, Object>> getOrderDetails(@PathVariable Integer soId) {
+        try {
+            Map<String, Object> orderDetails = salesOrderService.getOrderDetails(soId);
+            return ResponseEntity.ok(orderDetails);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
